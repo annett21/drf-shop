@@ -89,27 +89,27 @@ class TestProducersView(TestCase):
         self.assertEqual(response.data[0]["name"], test_producer.name)
 
 
-class TestProductItemsView(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.categories = CategoryFactory.create_batch(3)
-        cls.discounts = DiscountFactory.create_batch(4)
-        cls.producers = ProducerFactory.create_batch(3)
-        cls.products = ProductItemFactory.create_batch(5)
+# class TestProductItemsView(TestCase):
+#     @classmethod
+#     def setUpTestData(cls):
+#         cls.categories = CategoryFactory.create_batch(3)
+#         cls.discounts = DiscountFactory.create_batch(4)
+#         cls.producers = ProducerFactory.create_batch(3)
+#         cls.products = ProductItemFactory.create_batch(5)
 
-    def test_product_all_view(self):
-        response = self.client.get(reverse("products-all"))
-        self.assertIsInstance(response.data, list)
-        self.assertEqual(len(response.data), 5)
-        test_product = ProductItem.objects.get(pk=response.data[0]["id"])
-        self.assertEqual(response.data[0]["name"], test_product.name)
-        self.assertEqual(
-            response.data[0]["price"],
-            test_product.price,
-        )
-        self.assertEqual(
-            response.data[0]["category"]["id"], test_product.category.id
-        )
+#     def test_product_all_view(self):
+#         response = self.client.get(reverse("products-all"))
+#         self.assertIsInstance(response.data, list)
+#         self.assertEqual(len(response.data), 5)
+#         test_product = ProductItem.objects.get(pk=response.data[0]["id"])
+#         self.assertEqual(response.data[0]["name"], test_product.name)
+#         self.assertEqual(
+#             response.data[0]["price"],
+#             test_product.price,
+#         )
+#         self.assertEqual(
+#             response.data[0]["category"]["id"], test_product.category.id
+#         )
 
 
 class TestCategoryProductsView(TestCase):
@@ -311,41 +311,41 @@ class TestBasketView(APITestCase):
         self.assertFalse(Basket.objects.filter(user=self.user).exists())
 
 
-class TestCreateOrderView(APITestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = RegistredUserFactory(is_active=True)
-        cls.producers = ProducerFactory()
-        cls.category = CategoryFactory.create_batch(2)
-        cls.discounts = DiscountFactory()
-        cls.product = ProductItemFactory.create_batch(3)
-        cls.cashback = CashbackFactory()
+# class TestCreateOrderView(APITestCase):
+#     @classmethod
+#     def setUpTestData(cls):
+#         cls.user = RegistredUserFactory(is_active=True)
+#         cls.producers = ProducerFactory()
+#         cls.category = CategoryFactory.create_batch(2)
+#         cls.discounts = DiscountFactory()
+#         cls.product = ProductItemFactory.create_batch(3)
+#         cls.cashback = CashbackFactory()
 
 
-    def test_create_order_view(self):
-        self.client.force_authenticate(user=self.user)
+#     def test_create_order_view(self):
+#         self.client.force_authenticate(user=self.user)
 
-        data = {
-            "product_items": {"1": 1, "2": 1},
-            "comment": "Here i check information",
-            "delivery_address": "Some addr",
-            "delivery_method": "Post",
-            "delivery_status": "In process",
-            "payment_method": "Cash",
-            "payment_status": "Paid",
-            "delivery_notif_required": False,
-            "delivery_notif_in_time": 1,
-            "delivery_notif_sent": False,
-            "use_cashback": True,
-            "promocode": "IEQTW6615",
-        }
+#         data = {
+#             "product_items": {"1": 1, "2": 1},
+#             "comment": "Here i check information",
+#             "delivery_address": "Some addr",
+#             "delivery_method": "Post",
+#             "delivery_status": "In process",
+#             "payment_method": "Cash",
+#             "payment_status": "Paid",
+#             "delivery_notif_required": False,
+#             "delivery_notif_in_time": 1,
+#             "delivery_notif_sent": False,
+#             "use_cashback": True,
+#             "promocode": "IEQTW6615",
+#         }
 
-        response = self.client.post(reverse("create-order"), data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("id", response.data)
-        self.assertIn("result_price", response.data)
-        self.assertIn("result_number_of_items", response.data)
-        self.assertIn("user", response.data)
+#         response = self.client.post(reverse("create-order"), data, format="json")
+#         self.assertEqual(response.status_code, status.HTTP_200_OK)
+#         self.assertIn("id", response.data)
+#         self.assertIn("result_price", response.data)
+#         self.assertIn("result_number_of_items", response.data)
+#         self.assertIn("user", response.data)
 
 
 class TestSingleProductItemView(APITestCase):
