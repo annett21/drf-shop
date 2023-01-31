@@ -34,12 +34,21 @@ from django.utils.encoding import force_bytes, force_str
 from django.conf import settings
 from django.template.loader import render_to_string
 from .tokens import account_activation_token
-from django.core.mail import send_mail
+
+# from django.core.mail import send_mail
 
 from django.db.models import F
 from drf_yasg.utils import swagger_auto_schema
 
-from .tasks import some_task
+from .tasks import some_task, send_activation_mail, get_products_statistic
+
+
+class GetStatisticView(APIView):
+    permission_classes = (AllowAny, )
+
+    def get(self, request):
+        get_products_statistic.delay()
+        return Response(status=200)
 
 
 class CategoriesListView(ListAPIView):
@@ -82,7 +91,8 @@ class SingleProductItemView(APIView):
     def get(self, request, product_id):
         product_item = (
             ProductItem.objects.prefetch_related("comment_set")
-            .filter(id=product_id).first()
+            .filter(id=product_id)
+            .first()
         )
         serializer = ProductItemDetailSerializer(product_item)
         return Response(serializer.data)
@@ -119,33 +129,16 @@ class RegistartionView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = RegistarationSerializer
 
-    def send_mail(self, user_id, domain):
-        user = RegistredUser.objects.get(id=user_id)
-        mail_subject = "Activation link"
-        message = render_to_string(
-            "account_activation_email.html",
-            {
-                "user": user,
-                "domain": domain,
-                "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-                "token": account_activation_token.make_token(user),
-            },
-        )
-        to_email = user.email
-        send_mail(
-            mail_subject,
-            message,
-            recipient_list=[to_email],
-            from_email=settings.EMAIL_HOST_USER,
-        )
-
     def post(self, request):
+        """
+        Create non-active account and sent activation mail
+        """
         user = request.data.get("user")
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         current_site = get_current_site(request)
-        self.send_mail(user.id, current_site)
+        send_activation_mail.delay(user.id, str(current_site))
 
         return Response(serializer.data)
 
@@ -174,10 +167,8 @@ class LoginView(APIView):
 
     @swagger_auto_schema(
         request_body=LoginSerializer,
-        request_method='POST',
-        responses={
-            200: LoginSerializer
-        }
+        request_method="POST",
+        responses={200: LoginSerializer},
     )
     def post(self, request):
         user = request.data.get("user", {})
@@ -245,10 +236,8 @@ class BasketView(APIView):
 
     @swagger_auto_schema(
         request_body=DeleteProductSerializer,
-        request_method='DELETE',
-        responses={
-            200: ""
-        }
+        request_method="DELETE",
+        responses={200: ""},
     )
     def delete(self, request):
         input_serializer = DeleteProductSerializer(data=request.data)

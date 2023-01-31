@@ -13,7 +13,8 @@ from .views import (
     LoginView,
     BasketView,
     CreateOrderView,
-    SingleProductItemView
+    SingleProductItemView,
+    GetStatisticView,
 
 )
 
@@ -32,7 +33,7 @@ urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
     path("basket/", BasketView.as_view(), name="basket"),
     path("create_order/", CreateOrderView.as_view(), name="create-order"),
-
+    path("get-statistic/", GetStatisticView.as_view()),
 
     path("activate/<slug:uidb64>/<slug:token>/", ActivateAccountView.as_view(), name="activate"),
    
