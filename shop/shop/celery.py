@@ -9,9 +9,13 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
-    'every': {
+    'get_products_statistic': {
         'task': 'api.tasks.get_products_statistic',
         'schedule': 10.0,
         # 'schedule': crontab(),
+    },
+    'get_category_statistic': {
+        'task': 'api.tasks.get_category_statistic',
+        'schedule': crontab(),
     },
 }

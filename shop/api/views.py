@@ -40,14 +40,20 @@ from .tokens import account_activation_token
 from django.db.models import F
 from drf_yasg.utils import swagger_auto_schema
 
-from .tasks import some_task, send_activation_mail, get_products_statistic
+from .tasks import (
+    some_task,
+    send_activation_mail,
+    get_products_statistic,
+    get_category_statistic,
+)
 
 
 class GetStatisticView(APIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
     def get(self, request):
         get_products_statistic.delay()
+        get_category_statistic.delay()
         return Response(status=200)
 
 

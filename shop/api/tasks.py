@@ -1,5 +1,5 @@
 from celery import shared_task
-from .models import RegistredUser, Order, ProductItem
+from .models import RegistredUser, Order, ProductItem, Category
 from django.conf import settings
 
 from django.utils.http import urlsafe_base64_encode
@@ -72,3 +72,34 @@ def get_products_statistic():
 @shared_task()
 def test_scheduled_task():
     return True
+
+
+def _get_category_in_orders():
+    orders = Order.objects.all()
+    category_stat = dict()
+
+    for order in orders:
+        product_items = order.product_items 
+        for product_id in product_items.keys():
+            product = ProductItem.objects.get(id=product_id)
+
+            if category_stat.get(product.category_id) is None:
+                category_stat[product.category_id] = 1
+            else:
+                category_stat[product.category_id] += 1
+    
+    return category_stat
+
+
+@shared_task
+def get_category_statistic():
+    category_stat = _get_category_in_orders()
+
+    max_value = max(category_stat.values())
+    result_dict = {k: v for k, v in category_stat.items() if v == max_value}
+
+    with open("category_statistic.txt", "w") as stat_file:
+        for key, value in result_dict.items():
+            category = Category.objects.get(id=int(key))
+            stat_text = f"The best selling product category: {category.name}, it was sold {value} times.\n"
+            stat_file.write(stat_text)
