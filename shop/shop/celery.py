@@ -10,7 +10,7 @@ app.autodiscover_tasks()
 
 app.conf.beat_schedule = {
     'every': {
-        'task': 'api.tasks.get_product_statistic',
+        'task': 'api.tasks.get_products_statistic',
         'schedule': 10.0,
         # 'schedule': crontab(),
     },
