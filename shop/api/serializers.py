@@ -246,19 +246,20 @@ class OrderSerializer(serializers.ModelSerializer):
             result_price = result_price_with_discounts
 
         cashback = Cashback.objects.all().first()
-        add_cashback_points = result_price * (cashback.percent / 100)
-        user = self.context.get("request").user
+        if cashback is not None:
+            add_cashback_points = result_price * (cashback.percent / 100)
+            user = self.context.get("request").user
 
-        if data.get("use_cashback"):
-            if user.cashback <= cashback.max_cashback_payment:
-                result_price -= user.cashback
-                user.cashback = 0
-            else:
-                result_price -= cashback.max_cashback_payment
-                user.cashback -= cashback.max_cashback_payment
+            if data.get("use_cashback"):
+                if user.cashback <= cashback.max_cashback_payment:
+                    result_price -= user.cashback
+                    user.cashback = 0
+                else:
+                    result_price -= cashback.max_cashback_payment
+                    user.cashback -= cashback.max_cashback_payment
 
-        user.cashback += add_cashback_points
-        user.save()
+            user.cashback += add_cashback_points
+            user.save()
 
         return result_price
 
