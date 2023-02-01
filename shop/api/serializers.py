@@ -183,12 +183,17 @@ class DeleteProductSerializer(serializers.Serializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    def run_validation(self, data=None):
-        return data
+    promocode = serializers.CharField(write_only=True)
+    use_cashback = serializers.BooleanField(write_only=True)
 
     class Meta:
         model = Order
         fields = "__all__"
+        extra_kwargs = {
+            "result_price": {"read_only": True},
+            "result_number_of_items": {"read_only": True},
+            "user": {"read_only": True},
+        }
 
     def calculate_result_price(self, data):
         product_items_dict = data.get("product_items")
@@ -270,18 +275,11 @@ class OrderSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         return request.user
 
-    def create(self, validated_data):
-        validated_data["result_price"] = self.calculate_result_price(
-            validated_data
-        )
-        validated_data["result_number_of_items"] = self.result_number_of_items(
-            validated_data
-        )
-        validated_data["user"] = self.get_user()
+    def validate(self, attrs):
+        attrs["result_price"] = self.calculate_result_price(attrs)
+        attrs["result_number_of_items"] = self.result_number_of_items(attrs)
+        attrs["user"] = self.get_user()
+        attrs.pop("promocode", None)
+        attrs.pop("use_cashback", None)
 
-        if validated_data.get("promocode"):
-            validated_data.pop("promocode")
-
-        validated_data.pop("use_cashback")
-
-        return Order.objects.create(**validated_data)
+        return attrs
