@@ -1,51 +1,28 @@
-from django.shortcuts import render, get_object_or_404
+from datetime import timedelta
+
 from django.contrib.sites.shortcuts import get_current_site
-from .models import (
-    Category,
-    Producer,
-    ProductItem,
-    Promocode,
-    Discount,
-    Basket,
-)
-from .serializers import (
-    CategorySerializer,
-    DiscountSerializer,
-    PromocodeSerializer,
-    ProducerSerializer,
-    ProductItemSerializer,
-    RegistarationSerializer,
-    LoginSerializer,
-    BasketSerializer,
-    AddProductSerializer,
-    DeleteProductSerializer,
-    OrderSerializer,
-    ProductItemDetailSerializer,
-)
-from rest_framework.generics import ListAPIView
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import RegistredUser
-
-
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
-from django.conf import settings
-from django.template.loader import render_to_string
-from .tokens import account_activation_token
-
-# from django.core.mail import send_mail
-
 from django.db.models import F
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.generics import ListAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from .tasks import (
-    some_task,
-    send_activation_mail,
-    get_products_statistic,
-    get_category_statistic,
-)
+from .models import (Basket, Category, Discount, Producer, ProductItem,
+                     Promocode, RegistredUser)
+from .serializers import (AddProductSerializer, BasketSerializer,
+                          CategorySerializer, DeleteProductSerializer,
+                          DiscountSerializer, LoginSerializer, OrderSerializer,
+                          ProducerSerializer, ProductItemDetailSerializer,
+                          ProductItemSerializer, PromocodeSerializer,
+                          RegistarationSerializer)
+from .tasks import (get_category_statistic, get_products_statistic,
+                    send_activation_mail, send_delivery_notif, some_task)
+from .tokens import account_activation_token
 
 
 class GetStatisticView(APIView):
@@ -267,5 +244,16 @@ class CreateOrderView(APIView):
         input_serializer.is_valid(raise_exception=True)
 
         order = input_serializer.save()
+
+        notify_at = (
+            order.delivery_date - timedelta(hours=order.delivery_notif_in_time)
+        )
+
+        if (
+            order.delivery_method == "Courier"
+            and order.delivery_notif_required
+            and timezone.now() < notify_at
+        ):
+            send_delivery_notif.apply_async((order.user_id,), eta=notify_at)
 
         return Response(input_serializer.data)

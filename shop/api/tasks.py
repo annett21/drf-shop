@@ -103,3 +103,18 @@ def get_category_statistic():
             category = Category.objects.get(id=int(key))
             stat_text = f"The best selling product category: {category.name}, it was sold {value} times.\n"
             stat_file.write(stat_text)
+
+
+@shared_task
+def send_delivery_notif(user_id):
+    user = RegistredUser.objects.get(id=user_id)
+    mail_subject = "Delivery notification"
+    message = render_to_string("delivery_notification.html", context={"user": user})
+    to_email = user.email
+    is_sent = send_mail(
+        mail_subject,
+        message,
+        recipient_list=[to_email],
+        from_email=settings.EMAIL_HOST_USER,
+    )
+    return is_sent
