@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 EMAIL_HOST = 'smtp.yandex.by'
 EMAIL_PORT = 465
 EMAIL_HOST_USER = 't****@yandex.by'
-EMAIL_HOST_PASSWORD = '******'
+EMAIL_HOST_PASSWORD = '*****'
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 
@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_beat',
+    'django_extensions',
     'rest_framework',
     'api',
 ]
@@ -149,3 +151,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SHELL_PLUS = 'ptpython'
