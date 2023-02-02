@@ -1,4 +1,4 @@
 {% autoescape off %}
-Hi {{ user.login }},
-Your order will be delivered in 1 hour. 
+Hi {{ order.user.login }},
+Your order will be delivered in {{ order.delivery_notif_in_time }} hour(s). 
 {% endautoescape %}

@@ -109,7 +109,7 @@ def get_category_statistic():
 def send_delivery_notif(order_id):
     order = Order.objects.filter(id=order_id).prefetch_related("user").first()
     mail_subject = "Delivery notification"
-    message = render_to_string("delivery_notification.html", context={"user": order.user})
+    message = render_to_string("delivery_notification.html", context={"order": order})
     to_email = order.user.email
     is_sent = send_mail(
         mail_subject,
