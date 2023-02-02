@@ -254,6 +254,6 @@ class CreateOrderView(APIView):
             and order.delivery_notif_required
             and timezone.now() < notify_at
         ):
-            send_delivery_notif.apply_async((order.user_id,), eta=notify_at)
-
+            send_delivery_notif.apply_async((order.id,), eta=notify_at)
+            
         return Response(input_serializer.data)

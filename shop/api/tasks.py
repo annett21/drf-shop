@@ -106,15 +106,19 @@ def get_category_statistic():
 
 
 @shared_task
-def send_delivery_notif(user_id):
-    user = RegistredUser.objects.get(id=user_id)
+def send_delivery_notif(order_id):
+    order = Order.objects.filter(id=order_id).prefetch_related("user").first()
     mail_subject = "Delivery notification"
-    message = render_to_string("delivery_notification.html", context={"user": user})
-    to_email = user.email
+    message = render_to_string("delivery_notification.html", context={"user": order.user})
+    to_email = order.user.email
     is_sent = send_mail(
         mail_subject,
         message,
         recipient_list=[to_email],
         from_email=settings.EMAIL_HOST_USER,
     )
+    if is_sent:
+        order.delivery_notif_sent = True
+        order.save(update_fields=("delivery_notif_sent", ))
+        
     return is_sent
