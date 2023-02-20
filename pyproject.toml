@@ -20,6 +20,7 @@ redis = "4.4.2"
 time-machine = "2.9.0"
 django-celery-beat = "2.4.0"
 django-celery-results = "2.4.0"
+aiogram = "2.25.1"
 
 
 [tool.poetry.group.dev.dependencies]
