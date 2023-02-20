@@ -153,3 +153,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SHELL_PLUS = 'ptpython'
+
+TELEGRAM_API_TOKEN = "5861008155:AAH2QIkrTuSE5RBL9wNTprpKomVjih3rQuo"
