@@ -1,13 +1,12 @@
 from celery import shared_task
-from .models import RegistredUser, Order, ProductItem, Category
 from django.conf import settings
-
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
-from django.conf import settings
-from django.template.loader import render_to_string
-from .tokens import account_activation_token
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+
+from .models import Category, Order, ProductItem, RegistredUser
+from .tokens import account_activation_token
 
 
 @shared_task()

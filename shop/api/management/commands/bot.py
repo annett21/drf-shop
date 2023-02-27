@@ -1,14 +1,13 @@
-from django.conf import settings
+import logging
+
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 from aiogram.utils import executor
-
-from django.core.management.base import BaseCommand
-import logging
-import time
 from asgiref.sync import sync_to_async
-from ...models import Category, Producer
+from django.conf import settings
+from django.core.management.base import BaseCommand
 
+from ...models import Category, Producer
 
 logging.basicConfig(level=logging.INFO)
 

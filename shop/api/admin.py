@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Category, Cashback, Producer, ProductItem, Promocode,\
-    RegistredUser, Discount, Order, Basket, Comment
+
+from .models import (Basket, Cashback, Category, Comment, Discount, Order,
+                     Producer, ProductItem, Promocode, RegistredUser)
 
 
 class CategoryAdmin(admin.ModelAdmin):

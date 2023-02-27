@@ -1,15 +1,8 @@
-from faker import Faker
 from django.core.management.base import BaseCommand
-
-from tests.factories import (
-    CategoryFactory,
-    ProducerFactory,
-    DiscountFactory,
-    ProductItemFactory,
-    PromocodeFactory,
-    CashbackFactory,
-    RegistredUserFactory
-)
+from faker import Faker
+from tests.factories import (CashbackFactory, CategoryFactory, DiscountFactory,
+                             ProducerFactory, ProductItemFactory,
+                             PromocodeFactory, RegistredUserFactory)
 
 
 class Command(BaseCommand):

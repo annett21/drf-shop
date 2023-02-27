@@ -1,23 +1,11 @@
-from django.urls import path, re_path
-from .views import (
-    CategoriesListView,
-    DiscountsListView,
-    ProducersListView,
-    PromocodesListView,
-    ProductItemsListView,
-    CategoryProductsView,
-    ProducerProductsView,
-    DiscountProductsView,
-    RegistartionView,
-    ActivateAccountView,
-    LoginView,
-    BasketView,
-    CreateOrderView,
-    SingleProductItemView,
-    GetStatisticView,
+from django.urls import path
 
-)
-
+from .views import (ActivateAccountView, BasketView, CategoriesListView,
+                    CategoryProductsView, CreateOrderView,
+                    DiscountProductsView, DiscountsListView, GetStatisticView,
+                    LoginView, ProducerProductsView, ProducersListView,
+                    ProductItemsListView, PromocodesListView, RegistartionView,
+                    SingleProductItemView)
 
 urlpatterns = [
     path("categories-all/", CategoriesListView.as_view(), name="categories-all"),
