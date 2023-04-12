@@ -40,7 +40,7 @@ class CategoriesListView(ListAPIView):
     permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):
-        some_task.delay()
+        # some_task.delay()
         return super().get(request, *args, **kwargs)
 
 
